@@ -101,27 +101,37 @@ def lambda_automate(file):
         
                 for event in events:
                     #create rule here
-                    response = cloudwatch_events.put_rule(Name=event.get('name'),
-                                                          RoleArn=event.get('iamRole'),
-                                                          ScheduleExpression=event.get('schedule'),
-                                                          State=event.get('state'))
 
-                    response = lambda_client.add_permission(
-                        FunctionName=lambda_name,
-                        StatementId=str(int(time.time())),
-                        Action='lambda:*',
-                        Principal='events.amazonaws.com',
-                        SourceArn=response.get('RuleArn')
-                    )
+                    if event.get('type') == 'CloudWatchEvent':
+                        response = cloudwatch_events.put_rule(Name=event.get('name'),
+                                                              RoleArn=event.get('iamRole'),
+                                                              ScheduleExpression=event.get('schedule'),
+                                                              State=event.get('state'))
 
-                    response = cloudwatch_events.put_targets(Rule=event.get('name'),
-                                                             Targets=[
-                                                                {
-                                                                    'Arn': lambda_arn,
-                                                                    'Id': '{}CloudWatchEventsTarget'.format(lambda_name),
-                                                                }
-                                                             ])
-                    
+                        response = lambda_client.add_permission(
+                            FunctionName=lambda_name,
+                            StatementId=str(int(time.time())),
+                            Action='lambda:*',
+                            Principal='events.amazonaws.com',
+                            SourceArn=response.get('RuleArn')
+                        )
+
+                        response = cloudwatch_events.put_targets(Rule=event.get('name'),
+                                                                Targets=[
+                                                                    {
+                                                                        'Arn': lambda_arn,
+                                                                        'Id': '{}CloudWatchEventsTarget'.format(lambda_name),
+                                                                    }
+                                                                ])
+                    elif event.get('type') == 'SNS':
+                        response = lambda_client.add_permission(
+                            FunctionName=lambda_name,
+                            StatementId=str(int(time.time())),
+                            Action='lambda:*',
+                            Principal='sns.amazonaws.com',
+                            SourceArn=event.get('topicARN')
+                        )
+                
 
             print('Done deploying '+ item.get('name', ''))
 
