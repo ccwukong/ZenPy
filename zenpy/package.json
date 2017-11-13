@@ -21,9 +21,16 @@
         "packages": ["dependancy package 1", "dependancy package 2"],
         "files": ["dependancy file 1", "dependancy file 2"],
         "events": [{
+            "type": "CloudWatchEvent",
             "name": "test_event",
             "schedule": "rate(1 minute)",
             "state": "ENABLED",
+            "iamRole": "IAM_ROLE_ARN"
+        },{
+            "type": "SNS",
+            "name": "test_sns_trigger",
+            "state": "ENABLED",
+            "topicARN": "arn:aws:sns:ap-southeast-1:036145260541:DriverCreated",
             "iamRole": "IAM_ROLE_ARN"
         }]
     }],
