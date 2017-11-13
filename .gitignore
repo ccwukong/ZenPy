@@ -1,0 +1,6 @@
+dist/
+zenpy.egg-info/
+__pycache__/
+build/
+*.orig
+*/*.orig
