@@ -1,0 +1,12 @@
+Metadata-Version: 1.0
+Name: zen-py
+Version: 0.0.0.5
+Summary: An AWS service automation tools for the missing pieces of CloudFormation
+Home-page: UNKNOWN
+Author: Chen Cheng
+Author-email: nick@carpal.me
+License: Apache License 2.0
+Description-Content-Type: UNKNOWN
+Description: UNKNOWN
+Keywords: serverless,automation,aws
+Platform: any

@@ -1,0 +1,3 @@
+[console_scripts]
+zen = zenpy.zen:master_command
+
