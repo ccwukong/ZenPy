@@ -58,11 +58,18 @@ def lambda_automate(file):
 
             shutil.copy(lambda_file_path, tmp_folder)
 
-            os.system("source {}/bin/activate & pip install {} -t {}".format(
-                virtualenv.rstrip('/'),
-                ' '.join(item.get('packages')),
-                tmp_folder
-            ))
+            lambda_runtime = item.get('runtime', '')
+            if 'python' in lambda_runtime.lower():
+                os.system("source {}/bin/activate & pip install {} -t {}".format(
+                    virtualenv.rstrip('/'),
+                    ' '.join(item.get('packages')),
+                    tmp_folder
+                ))
+            elif 'nodejs' in lambda_runtime.lower():
+                os.system("npm install --prefix {} {}".format(
+                    tmp_folder, 
+                    ' '.join(item.get('packages'))
+                ))
 
             print('Packaging Lambda function {}...'.format(item.get('name', '')))
 
