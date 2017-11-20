@@ -49,8 +49,6 @@ def es_automate(file):
                         SnapshotOptions={
                             'AutomatedSnapshotStartHour': item.get('automatedSnapshotStartHour')
                         })
-            
-            print(response)
 
             #create indices
             connection = pymysql.connect(host=item.get('dbServer'),

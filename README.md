@@ -1,7 +1,14 @@
 # ZenPy
 A rewrite of GlintPy.
 
-pip install zenpy
+ZenPy is created to fill in missing pieces of AWS CloudFormation services.
+
+ZenPy automates:
+* AWS Lambda function(Python or NodeJS) packaging and deployment
+* ElasticSearch indexing(under development)
+* RDS instance creation(under development)
+
+To install ZenPy: **pip install zenpy**
 
 # Sample template for package.json
 
