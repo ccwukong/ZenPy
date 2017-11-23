@@ -129,5 +129,14 @@
                                     "volumeSize": 10,
                                     "iops": 2},
                       "accessPolicies": "access policy in JSON format",
-                      "automatedSnapshotStartHour": 0}]
+                      "automatedSnapshotStartHour": 0}],
+    "mappings": [{
+        "sourceHost": "source database host",
+        "sourceUsername": "source database username",
+        "sourcePassword": "source database password",
+        "sourceDB": "source database name",
+        "sourceSQL": "source SQL statement",
+        "targetHost": "target storage host",
+        "targetSchema": {}
+    }]
 }
