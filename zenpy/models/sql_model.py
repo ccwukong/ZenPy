@@ -26,10 +26,14 @@ class MySQLModel(SQLModel):
                                          db=self._db,
                                          cursorclass=pymysql.cursors.DictCursor)
 
+            def map_row_to_schema(row, fields):
+                return {k:v for k, v in row.items() if k in fields}
+
             with connection.cursor() as cursor:
                 cursor.execute(sql)
                 result = cursor.fetchall()
-                print(result)
+                
+                return (map_row_to_schema(item, self._nosql_schema.get('fields')) for item in result)
         finally:
             connection.close()
 
