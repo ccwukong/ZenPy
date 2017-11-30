@@ -112,13 +112,13 @@ def lambda_automate(file):
                     if event.get('type') == 'CloudWatchEvent':
                         if event.get('schedule', None):
                             response = cloudwatch_events.put_rule(Name=event.get('name'),
-                                                                RoleArn=event.get('iamRole'),
-                                                                ScheduleExpression=event.get('schedule'),
-                                                                State=event.get('state'))
+                                                                  RoleArn=event.get('iamRole'),
+                                                                  ScheduleExpression=event.get('schedule'),
+                                                                  State=event.get('state'))
                         else:
                             response = cloudwatch_events.put_rule(Name=event.get('name'),
-                                                                RoleArn=event.get('iamRole'),
-                                                                State=event.get('state'))
+                                                                  RoleArn=event.get('iamRole'),
+                                                                  State=event.get('state'))
 
                         response = lambda_client.add_permission(
                             FunctionName=lambda_name,
@@ -129,12 +129,12 @@ def lambda_automate(file):
                         )
 
                         response = cloudwatch_events.put_targets(Rule=event.get('name'),
-                                                                Targets=[
+                                                                 Targets=[
                                                                     {
                                                                         'Arn': lambda_arn,
                                                                         'Id': '{}CloudWatchEventsTarget'.format(lambda_name),
                                                                     }
-                                                                ])
+                                                                 ])
                     elif event.get('type') == 'SNS':
                         response = lambda_client.add_permission(
                             FunctionName=lambda_name,
