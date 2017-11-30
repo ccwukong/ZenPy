@@ -1,6 +1,7 @@
 from decimal import *
 import json
 import pymysql
+from .dynamodb import DynamoDB
 
 class SQLModel:
     def __init__(self, host, username, password, db, nosql_schema, size):
@@ -28,7 +29,7 @@ class MySQLModel(SQLModel):
                                          cursorclass=pymysql.cursors.DictCursor)
 
             def map_row_to_schema(row, fields):
-                return {k: str(v) for k, v in row.items() if k in fields}
+                return {k: DynamoDB.cast_value(v) for k, v in row.items() if k in fields}
 
             with connection.cursor() as cursor:
                 cursor.execute(sql)

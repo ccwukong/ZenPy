@@ -3,6 +3,8 @@ import os
 import pymysql
 from boto3 import resource
 from boto3.dynamodb.conditions import Key
+import numbers
+import decimal
 
 class DynamoDBModelMixin(object):  
     def __str__(self):
@@ -90,3 +92,12 @@ class DynamoDB(object):
                 self._table.delete_item(Key={list(item.keys())[0]: list(item.values())[0]})
         except Exception as e:
             raise e
+    
+    @staticmethod
+    def cast_value(value):
+        no_cast = (str, bool)
+        if isinstance(value, numbers.Number):
+            return decimal.Decimal(value)
+        elif isinstance(value, no_cast):
+            return value
+         

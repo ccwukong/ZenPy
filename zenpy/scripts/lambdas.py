@@ -110,10 +110,15 @@ def lambda_automate(file):
                     #create rule here
 
                     if event.get('type') == 'CloudWatchEvent':
-                        response = cloudwatch_events.put_rule(Name=event.get('name'),
-                                                              RoleArn=event.get('iamRole'),
-                                                              ScheduleExpression=event.get('schedule'),
-                                                              State=event.get('state'))
+                        if event.get('schedule', None):
+                            response = cloudwatch_events.put_rule(Name=event.get('name'),
+                                                                RoleArn=event.get('iamRole'),
+                                                                ScheduleExpression=event.get('schedule'),
+                                                                State=event.get('state'))
+                        else:
+                            response = cloudwatch_events.put_rule(Name=event.get('name'),
+                                                                RoleArn=event.get('iamRole'),
+                                                                State=event.get('state'))
 
                         response = lambda_client.add_permission(
                             FunctionName=lambda_name,
