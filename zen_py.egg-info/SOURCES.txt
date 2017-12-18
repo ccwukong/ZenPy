@@ -8,6 +8,13 @@ zen_py.egg-info/requires.txt
 zen_py.egg-info/top_level.txt
 zenpy/__init__.py
 zenpy/zen.py
+zenpy/models/__init__.py
+zenpy/models/dynamodb.py
+zenpy/models/sql_model.py
+zenpy/models/state_machine.py
 zenpy/scripts/__init__.py
 zenpy/scripts/elasticsearch.py
 zenpy/scripts/lambdas.py
+zenpy/scripts/sql_to_nosql.py
+zenpy/tests/__init__.py
+zenpy/tests/test_data_mapping.py

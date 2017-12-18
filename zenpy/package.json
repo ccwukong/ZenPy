@@ -18,6 +18,7 @@
         "iamRole": "iam role to execute the lambda function",
         "timeout": 3,
         "path": "lambda function directory",
+        "stages": ["dev", "staging"],
         "packages": ["dependancy package 1", "dependancy package 2"],
         "files": ["dependancy file 1", "dependancy file 2"],
         "events": [{
