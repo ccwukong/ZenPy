@@ -18,9 +18,8 @@ def mysql_to_dynamodb(file):
         print('Error. Unable to load the setting file.')
         sys.exit()
 
-    dynamo = DynamoDB('customer_orders')
-
     for item in data.get('mappings'):
+        dynamo = DynamoDB(table_name=item.get('targetDB'))
         mysql_model = MySQLModel(host=item.get('sourceHost'),
                                  username=item.get('sourceUsername'),
                                  password=item.get('sourcePassword'),
@@ -28,9 +27,13 @@ def mysql_to_dynamodb(file):
                                  nosql_schema=item.get('targetSchema'))
 
         gen = mysql_model.mapping(item.get('sourceSQL'))
-
+        item_list = []
         for sub_item in gen:
-            dynamo.add(sub_item)
+            item_list.append(sub_item)
+
+        #insert records into Dynamo DB
+        dynamo.add_batch(item_list)
+        
 
 if __name__ == '__main__':
     mysql_to_dynamodb('~/Downloads/package.json')

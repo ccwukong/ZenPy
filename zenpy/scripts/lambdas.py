@@ -35,118 +35,117 @@ def lambda_automate(file):
     cloudwatch_events = boto3.client('events')
     for item in lambdas:
         if not item.get('skip'):
-            lambda_name = item.get('name', '').split('.')[0]
-            path = item.get('path', '').rstrip('/')
+            for stage in item.get('stages', []):
+                lambda_name = '{}-{}'.format(item.get('name', '').split('.')[0], stage)
+                path = item.get('path', '').rstrip('/')
 
-            if not os.path.isabs(path):
-                # in case relative path is given and not in format ~/file_path
-                path = os.path.abspath(os.path.expanduser(path))
+                if not os.path.isabs(path):
+                    # in case relative path is given and not in format ~/file_path
+                    path = os.path.abspath(os.path.expanduser(path))
 
-            path += '/' 
+                path += '/' 
 
-            lambda_file_path = ''.join([path, item.get('name', '')])
+                lambda_file_path = ''.join([path, item.get('name', '')])
 
-            
-            if not os.path.exists(lambda_file_path):
-                raise FileNotFoundError('Cannot find the lambda function {}'.format(item.get('name', '')))
-                sys.exit()
-
-            tmp_folder = ''.join([path, lambda_name, '_']) + str(int(time.time()))
-
-            if not os.path.exists(tmp_folder):
-                os.makedirs(tmp_folder)
-
-            shutil.copy(lambda_file_path, tmp_folder)
-
-            lambda_runtime = item.get('runtime', '')
-            if 'python' in lambda_runtime.lower():
-                os.system("source {}/bin/activate & pip install {} -t {}".format(
-                    virtualenv.rstrip('/'),
-                    ' '.join(item.get('packages')),
-                    tmp_folder
-                ))
-            elif 'nodejs' in lambda_runtime.lower():
-                os.system("npm install --prefix {} {}".format(
-                    tmp_folder, 
-                    ' '.join(item.get('packages'))
-                ))
-
-            print('Packaging Lambda function {}...'.format(item.get('name', '')))
-
-            zip_file = shutil.make_archive(base_name=tmp_folder,
-                                        format='zip',
-                                        root_dir=tmp_folder, 
-                                        base_dir='./' )
-            shutil.rmtree(tmp_folder)
-
-            print('Done packaging lambda functions.')
-
-            print('Start to deploy lambda functions.')
-            with open(zip_file, 'rb') as f:
-                print('Deploying {}...'.format(lambda_name))
-
-                try:
-                    lambda_client.delete_function(FunctionName=lambda_name)
-                except:
-                    pass
-
-                #Let the script fail if anything goes wrong here
-                response = lambda_client.create_function(FunctionName=lambda_name,
-                                                        Runtime=item.get('runtime', '').lower(),
-                                                        Role="arn:aws:iam::"+app_id+":role/"+item.get('iamRole', ''),
-                                                        Handler='.'.join([lambda_name,
-                                                                          item.get('handler', '')]),
-                                                        Code={'ZipFile': f.read()},
-                                                        Environment={'Variables': item.get('environmentVariables')},
-                                                        Timeout=item.get('timeout', 3),
-                                                        Publish=True)
-
-                #Create cloudwatch event trigger for lambda function here
-                lambda_arn = response.get('FunctionArn', '')
-
-                events = item.get('events')
-        
-                for event in events:
-                    #create rule here
-
-                    if event.get('type') == 'CloudWatchEvent':
-                        if event.get('schedule', None):
-                            response = cloudwatch_events.put_rule(Name=event.get('name'),
-                                                                  RoleArn=event.get('iamRole'),
-                                                                  ScheduleExpression=event.get('schedule'),
-                                                                  State=event.get('state'))
-                        else:
-                            response = cloudwatch_events.put_rule(Name=event.get('name'),
-                                                                  RoleArn=event.get('iamRole'),
-                                                                  State=event.get('state'))
-
-                        response = lambda_client.add_permission(
-                            FunctionName=lambda_name,
-                            StatementId=str(int(time.time())),
-                            Action='lambda:*',
-                            Principal='events.amazonaws.com',
-                            SourceArn=response.get('RuleArn')
-                        )
-
-                        response = cloudwatch_events.put_targets(Rule=event.get('name'),
-                                                                 Targets=[
-                                                                    {
-                                                                        'Arn': lambda_arn,
-                                                                        'Id': '{}CloudWatchEventsTarget'.format(lambda_name),
-                                                                    }
-                                                                 ])
-                    elif event.get('type') == 'SNS':
-                        response = lambda_client.add_permission(
-                            FunctionName=lambda_name,
-                            StatementId=str(int(time.time())),
-                            Action='lambda:*',
-                            Principal='sns.amazonaws.com',
-                            SourceArn=event.get('topicARN')
-                        )
                 
+                if not os.path.exists(lambda_file_path):
+                    raise FileNotFoundError('Cannot find the lambda function {}'.format(item.get('name', '')))
+                    sys.exit()
 
+                tmp_folder = ''.join([path, lambda_name, '_']) + str(int(time.time()))
+
+                if not os.path.exists(tmp_folder):
+                    os.makedirs(tmp_folder)
+
+                shutil.copy(lambda_file_path, tmp_folder)
+
+                lambda_runtime = item.get('runtime', '')
+                if 'python' in lambda_runtime.lower():
+                    os.system("source {}/bin/activate & pip install {} -t {}".format(
+                        virtualenv.rstrip('/'),
+                        ' '.join(item.get('packages')),
+                        tmp_folder
+                    ))
+                elif 'nodejs' in lambda_runtime.lower():
+                    os.system("npm install --prefix {} {}".format(
+                        tmp_folder, 
+                        ' '.join(item.get('packages'))
+                    ))
+
+                print('Packaging Lambda function {}...'.format(item.get('name', '')))
+
+                zip_file = shutil.make_archive(base_name=tmp_folder,
+                                            format='zip',
+                                            root_dir=tmp_folder, 
+                                            base_dir='./' )
+                shutil.rmtree(tmp_folder)
+
+                print('Done packaging lambda functions.')
+
+                print('Start to deploy lambda functions.')
+                with open(zip_file, 'rb') as f:
+                    print('Deploying {}...'.format(lambda_name))
+
+                    try:
+                        lambda_client.delete_function(FunctionName=lambda_name)
+                    except:
+                        pass
+
+                    #Let the script fail if anything goes wrong here
+                    response = lambda_client.create_function(FunctionName=lambda_name,
+                                                            Runtime=item.get('runtime', '').lower(),
+                                                            Role="arn:aws:iam::"+app_id+":role/"+item.get('iamRole', ''),
+                                                            Handler='.'.join([lambda_name,
+                                                                            item.get('handler', '')]),
+                                                            Code={'ZipFile': f.read()},
+                                                            Environment={'Variables': item.get('environmentVariables')},
+                                                            Timeout=item.get('timeout', 3),
+                                                            Publish=True)
+
+                    #Create cloudwatch event trigger for lambda function here
+                    lambda_arn = response.get('FunctionArn', '')
+
+                    events = item.get('events')
+                    
+                    for event in events:
+                        #create rule here
+
+                        if event.get('type') == 'CloudWatchEvent':
+                            if event.get('schedule', None):
+                                response = cloudwatch_events.put_rule(Name=event.get('name'),
+                                                                    RoleArn=event.get('iamRole'),
+                                                                    ScheduleExpression=event.get('schedule'),
+                                                                    State=event.get('state'))
+                            else:
+                                response = cloudwatch_events.put_rule(Name=event.get('name'),
+                                                                    RoleArn=event.get('iamRole'),
+                                                                    State=event.get('state'))
+
+                            response = lambda_client.add_permission(
+                                FunctionName=lambda_name,
+                                StatementId=str(int(time.time())),
+                                Action='lambda:*',
+                                Principal='events.amazonaws.com',
+                                SourceArn=response.get('RuleArn')
+                            )
+
+                            response = cloudwatch_events.put_targets(Rule=event.get('name'),
+                                                                    Targets=[
+                                                                        {
+                                                                            'Arn': lambda_arn,
+                                                                            'Id': '{}CloudWatchEventsTarget'.format(lambda_name),
+                                                                        }
+                                                                    ])
+                        elif event.get('type') == 'SNS':
+                            response = lambda_client.add_permission(
+                                FunctionName=lambda_name,
+                                StatementId=str(int(time.time())),
+                                Action='lambda:*',
+                                Principal='sns.amazonaws.com',
+                                SourceArn=event.get('topicARN')
+                            )
+                
             print('Done deploying '+ item.get('name', ''))
-
     print('Success! Done deploying.')
 
 
