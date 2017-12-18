@@ -9,7 +9,7 @@ ZenPy automates:
 * ElasticSearch indexing(under development)
 * RDS instance creation(under development)
 
-To install ZenPy: **pip install zenpy**
+To install ZenPy: **pip install zen-py**
 
 
 
