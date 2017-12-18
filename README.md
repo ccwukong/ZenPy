@@ -35,6 +35,7 @@ To run ZenPy, type **zen** in your command line interface, and it will ask for t
         "name": "lambda function name",
         "handler": "lambda function handler name",
         "runtime": "python version",
+        "stages": ["stage A", "stage B", ...],
         "environmentVariables": {},
         "iamRole": "iam role to execute the lambda function",
         "timeout": 3,
