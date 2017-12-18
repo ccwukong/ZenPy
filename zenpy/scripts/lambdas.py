@@ -137,13 +137,13 @@ def lambda_automate(file):
                                                                         }
                                                                     ])
                         elif event.get('type') == 'SNS':
-                            response = lambda_client.add_permission(
-                                FunctionName=lambda_name,
-                                StatementId=str(int(time.time())),
-                                Action='lambda:*',
-                                Principal='sns.amazonaws.com',
-                                SourceArn=event.get('topicARN')
-                            )
+                            if event.get('stage') == stage:
+                                response = lambda_client.add_permission(
+                                    FunctionName=lambda_name,
+                                    StatementId=str(int(time.time())),
+                                    Action='lambda:*',
+                                    Principal='sns.amazonaws.com',
+                                    SourceArn=event.get('topicARN'))                            
                 
             print('Done deploying '+ item.get('name', ''))
     print('Success! Done deploying.')

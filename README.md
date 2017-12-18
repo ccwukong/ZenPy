@@ -52,7 +52,15 @@ To run ZenPy, type **zen** in your command line interface, and it will ask for t
             "type": "SNS",
             "name": "test_sns_trigger",
             "state": "ENABLED",
-            "topicARN": "SNS_ARN",
+            "stage": "dev",
+            "topicARN": "Topic ARN",
+            "iamRole": "IAM_ROLE_ARN"
+        },{
+            "type": "SNS",
+            "name": "test_sns_trigger",
+            "state": "ENABLED",
+            "stage": "staging",
+            "topicARN": "Topic ARN",
             "iamRole": "IAM_ROLE_ARN"
         }]
     }],
