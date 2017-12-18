@@ -36,7 +36,8 @@ def lambda_automate(file):
     for item in lambdas:
         if not item.get('skip'):
             for stage in item.get('stages', []):
-                lambda_name = '{}-{}'.format(item.get('name', '').split('.')[0], stage)
+                lambda_name = item.get('name', '').split('.')[0]
+                lambda_stage = '{}-{}'.format(lambda_name, stage)
                 path = item.get('path', '').rstrip('/')
 
                 if not os.path.isabs(path):
@@ -52,7 +53,7 @@ def lambda_automate(file):
                     raise FileNotFoundError('Cannot find the lambda function {}'.format(item.get('name', '')))
                     sys.exit()
 
-                tmp_folder = ''.join([path, lambda_name, '_']) + str(int(time.time()))
+                tmp_folder = ''.join([path, lambda_stage, '_']) + str(int(time.time()))
 
                 if not os.path.exists(tmp_folder):
                     os.makedirs(tmp_folder)
@@ -84,23 +85,23 @@ def lambda_automate(file):
 
                 print('Start to deploy lambda functions.')
                 with open(zip_file, 'rb') as f:
-                    print('Deploying {}...'.format(lambda_name))
+                    print('Deploying {}...'.format(lambda_stage))
 
                     try:
-                        lambda_client.delete_function(FunctionName=lambda_name)
+                        lambda_client.delete_function(FunctionName=lambda_stage)
                     except:
                         pass
 
                     #Let the script fail if anything goes wrong here
-                    response = lambda_client.create_function(FunctionName=lambda_name,
-                                                            Runtime=item.get('runtime', '').lower(),
-                                                            Role="arn:aws:iam::"+app_id+":role/"+item.get('iamRole', ''),
-                                                            Handler='.'.join([lambda_name,
-                                                                            item.get('handler', '')]),
-                                                            Code={'ZipFile': f.read()},
-                                                            Environment={'Variables': item.get('environmentVariables')},
-                                                            Timeout=item.get('timeout', 3),
-                                                            Publish=True)
+                    response = lambda_client.create_function(FunctionName=lambda_stage,
+                                                             Runtime=item.get('runtime', '').lower(),
+                                                             Role="arn:aws:iam::"+app_id+":role/"+item.get('iamRole', ''),
+                                                             Handler='.'.join([lambda_name,
+                                                                               item.get('handler', '')]),
+                                                             Code={'ZipFile': f.read()},
+                                                             Environment={'Variables': item.get('environmentVariables')},
+                                                             Timeout=item.get('timeout', 3),
+                                                             Publish=True)
 
                     #Create cloudwatch event trigger for lambda function here
                     lambda_arn = response.get('FunctionArn', '')
@@ -122,7 +123,7 @@ def lambda_automate(file):
                                                                     State=event.get('state'))
 
                             response = lambda_client.add_permission(
-                                FunctionName=lambda_name,
+                                FunctionName=lambda_stage,
                                 StatementId=str(int(time.time())),
                                 Action='lambda:*',
                                 Principal='events.amazonaws.com',
@@ -133,13 +134,13 @@ def lambda_automate(file):
                                                                     Targets=[
                                                                         {
                                                                             'Arn': lambda_arn,
-                                                                            'Id': '{}CloudWatchEventsTarget'.format(lambda_name),
+                                                                            'Id': '{}CloudWatchEventsTarget'.format(lambda_stage),
                                                                         }
                                                                     ])
                         elif event.get('type') == 'SNS':
                             if event.get('stage') == stage:
                                 response = lambda_client.add_permission(
-                                    FunctionName=lambda_name,
+                                    FunctionName=lambda_stage,
                                     StatementId=str(int(time.time())),
                                     Action='lambda:*',
                                     Principal='sns.amazonaws.com',
