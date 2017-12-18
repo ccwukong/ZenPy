@@ -36,7 +36,7 @@ def lambda_automate(file):
     for item in lambdas:
         if not item.get('skip'):
             for stage in item.get('stages', []):
-                lambda_name = item.get('name', '').split('.')[0]
+                lambda_name = item.get('alias', '').split('.')[0] if item.get('alias', '') else item.get('name', '').split('.')[0] 
                 lambda_stage = '{}-{}'.format(lambda_name, stage)
                 path = item.get('path', '').rstrip('/')
 
@@ -131,7 +131,7 @@ def lambda_automate(file):
                             )
 
                             response = cloudwatch_events.put_targets(Rule=event.get('name'),
-                                                                    Targets=[
+                                                                     Targets=[
                                                                         {
                                                                             'Arn': lambda_arn,
                                                                             'Id': '{}CloudWatchEventsTarget'.format(lambda_stage),
