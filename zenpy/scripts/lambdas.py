@@ -96,7 +96,7 @@ def lambda_automate(file):
                     response = lambda_client.create_function(FunctionName=lambda_stage,
                                                              Runtime=item.get('runtime', '').lower(),
                                                              Role="arn:aws:iam::"+app_id+":role/"+item.get('iamRole', ''),
-                                                             Handler='.'.join([lambda_name,
+                                                             Handler='.'.join([item.get('name', '').split('.')[0],
                                                                                item.get('handler', '')]),
                                                              Code={'ZipFile': f.read()},
                                                              Environment={'Variables': item.get('environmentVariables')},
