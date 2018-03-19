@@ -5,7 +5,7 @@ from .scripts.sql_to_nosql import mysql_to_dynamodb
 
 @click.command()
 @click.option('--file', prompt='Provide the path of package.json file')
-def master_command(file=''):
+def master_command(file='~/Downloads/package.json'):
     lambda_automate(file)
     #mysql_to_dynamodb(file)
 
