@@ -43,6 +43,8 @@ To run ZenPy, type **zen** in your command line interface, and it will ask for t
         "path": "lambda function directory",
         "packages": ["dependancy package 1", "dependancy package 2"],
         "files": ["dependancy file 1", "dependancy file 2"],
+	"vendor": [{"rootDirectory": "...",
+		    "modules": ["moduel_folder_name"]}],
         "events": [{
             "type": "CloudWatchEvent",
             "name": "test_event",
