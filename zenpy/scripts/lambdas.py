@@ -49,10 +49,10 @@ def lambda_automate(file):
                         # in case relative path is given and not in format ~/file_path
                         path = os.path.abspath(os.path.expanduser(path))
 
-                    path += '/' 
+                    path += '/'
 
                     lambda_file_path = ''.join([path, item.get('name', '')])
-                    
+                  
                     if not os.path.exists(lambda_file_path):
                         raise FileNotFoundError(
                             'Cannot find the lambda function {}'.format(
@@ -81,7 +81,7 @@ def lambda_automate(file):
                             for f in src_files:
                                 shutil.copy(
                                     vendor_item.get('rootDirectory', '') +
-                                    '/' + module + '/' + f, 
+                                    '/' + module + '/' + f,
                                     tmp_module_folder + '/' + f)
 
                     lambda_runtime = item.get('runtime', '')
@@ -133,7 +133,7 @@ def lambda_automate(file):
                             Timeout=item.get('timeout', 3),
                             Publish=True)
 
-                        # Create cloudwatch event trigger 
+                        # Create cloudwatch event trigger
                         # for lambda function here
                         lambda_arn = response.get('FunctionArn', '')
 
@@ -156,7 +156,8 @@ def lambda_automate(file):
 
                                 response = lambda_client.add_permission(
                                     FunctionName=lambda_stage,
-                                    StatementId=str(time.time()).replace('.', ''),
+                                    StatementId=str(
+                                        time.time()).replace('.', ''),
                                     Action='lambda:*',
                                     Principal='events.amazonaws.com',
                                     SourceArn=response.get('RuleArn'))
@@ -175,8 +176,8 @@ def lambda_automate(file):
                                         StatementId=str(int(time.time())),
                                         Action='lambda:*',
                                         Principal='sns.amazonaws.com',
-                                        SourceArn=event.get('topicARN'))                            
-                    
+                                        SourceArn=event.get('topicARN'))                   
+                  
                 print('Done deploying ' + item.get('name', ''))
         print('Success! Done deploying.')
     except Exception as e:
