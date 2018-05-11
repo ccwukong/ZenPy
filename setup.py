@@ -6,7 +6,7 @@ setup(
     description='A set of AWS service automation tools',
     license='Apache License 2.0',
     install_requires=['boto3', 'pymysql', 'requests', "click"],
-    version='0.0.0.19',
+    version='0.0.0.20',
     entry_points={
           'console_scripts': [
               'zen = zenpy.zen:master_command'
