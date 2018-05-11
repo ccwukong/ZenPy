@@ -16,6 +16,8 @@ To install ZenPy: **pip install zen-py**
 
 To run ZenPy, type **zen** in your command line interface, and it will ask for the path to ***package.json*** file to load the configurations.
 
+**zen ~/path.../package.json**
+
 # Sample template for package.json
 
 ```
