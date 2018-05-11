@@ -93,7 +93,7 @@ def lambda_automate(file):
                                 tmp_folder))
                     elif 'nodejs' in lambda_runtime.lower():
                         os.system("npm install --prefix {} {}".format(
-                            tmp_folder, 
+                            tmp_folder,
                             ' '.join(item.get('packages'))
                         ))
 
@@ -166,18 +166,18 @@ def lambda_automate(file):
                                     Rule=event.get('name'),
                                     Targets=[
                                         {'Arn': lambda_arn,
-                                         'Id': 
+                                         'Id':
                                          '{}CloudWatchEventsTarget'.format(
                                             lambda_stage)}])
                             elif event.get('type') == 'SNS':
                                 if event.get('stage') == stage:
                                     response = lambda_client.add_permission(
                                         FunctionName=lambda_stage,
-                                        StatementId=str(int(time.time())),
+                                        StatementId=str(time.time()).replace('.', ''),
                                         Action='lambda:*',
                                         Principal='sns.amazonaws.com',
-                                        SourceArn=event.get('topicARN'))                   
-                  
+                                        SourceArn=event.get('topicARN'))
+
                 print('Done deploying ' + item.get('name', ''))
         print('Success! Done deploying.')
     except Exception as e:
