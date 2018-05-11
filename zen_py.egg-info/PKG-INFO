@@ -1,7 +1,7 @@
 Metadata-Version: 1.0
 Name: zen-py
-Version: 0.0.0.18
-Summary: An AWS service automation tools for the missing pieces of CloudFormation
+Version: 0.0.0.19
+Summary: A set of AWS service automation tools
 Home-page: UNKNOWN
 Author: Chen Cheng
 Author-email: ccwukong@gmail.com
