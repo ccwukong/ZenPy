@@ -1,23 +1,24 @@
 import base64
-import boto3
 import json
 import os
 import sys
 import shutil
 import string
 import time
+import boto3
 
 
 def lambda_automate(file):
     try:
         # Load the list of lambda functions to be updated to AWS
         file = os.path.abspath(os.path.expanduser(file))
-        try:
-            with open(file) as data_file:
-                data = json.load(data_file)
-        except Exception as e:
+
+        if not file:
             print('Error. Unable to load the setting file.')
-            sys.exit()
+            sys.exit(-1)
+
+        with open(file) as data_file:
+            data = json.load(data_file)
 
         lambdas = data.get('lambdas', None)
         virtualenv = data.get('pythonVirtualenv')
@@ -31,7 +32,7 @@ def lambda_automate(file):
 
         if not lambdas:
             print('ErrorNo lambbda functions found in setting file.')
-            sys.exit()
+            sys.exit(-1)
 
         print('Start to package lambda functions...')
 
@@ -52,10 +53,9 @@ def lambda_automate(file):
                     path += '/'
 
                     lambda_file_path = ''.join([path, item.get('name', '')])
-                  
+
                     if not os.path.exists(lambda_file_path):
-                        raise FileNotFoundError(
-                            'Cannot find the lambda function {}'.format(
+                        print('Cannot find the lambda function {}'.format(
                                 item.get('name', '')))
                         sys.exit()
 
@@ -71,7 +71,7 @@ def lambda_automate(file):
                     for vendor_item in item.get('vendor', []):
                         for module in vendor_item.get('modules'):
                             tmp_module_folder = tmp_folder + '/' + module
-                            
+
                             if not os.path.exists(tmp_module_folder):
                                 os.makedirs(tmp_module_folder)
 
@@ -122,7 +122,7 @@ def lambda_automate(file):
                         response = lambda_client.create_function(
                             FunctionName=lambda_stage,
                             Runtime=item.get('runtime', '').lower(),
-                            Role="arn:aws:iam::" + app_id + 
+                            Role="arn:aws:iam::" + app_id +
                                  ":role/" + item.get('iamRole', ''),
                             Handler='.'.join(
                                 [item.get('name', '').split('.')[0],
@@ -138,7 +138,7 @@ def lambda_automate(file):
                         lambda_arn = response.get('FunctionArn', '')
 
                         events = item.get('events')
-                        
+
                         for event in events:
                             # Create rule here
                             if event.get('type') == 'CloudWatchEvent':
@@ -173,7 +173,8 @@ def lambda_automate(file):
                                 if event.get('stage') == stage:
                                     response = lambda_client.add_permission(
                                         FunctionName=lambda_stage,
-                                        StatementId=str(time.time()).replace('.', ''),
+                                        StatementId=str(
+                                            time.time()).replace('.', ''),
                                         Action='lambda:*',
                                         Principal='sns.amazonaws.com',
                                         SourceArn=event.get('topicARN'))
