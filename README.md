@@ -23,8 +23,8 @@ To run ZenPy, type **zen** in your command line interface, and it will ask for t
 ```
 {
     "version": "0.0.1",
-    "author": "Chen Cheng",
-    "email": "nick@carpal.com",
+    "author": "Your name",
+    "email": "someone@aexample.com",
     "description": "An AWS service automation toolbox",
     "region": "your aws account region",
     "pythonVirtualenv": "your python virtualenv path",
